@@ -52,6 +52,19 @@ pipeline {
           }
      }
 
+      stage('Save Artefact') {
+          agent any
+          steps {
+             script {
+               sh '''
+                 docker save  ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG > /tmp/alpinehelloworld.tar
+                 archiveArtifacts artifacts: '//tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
+                 
+               '''
+             }
+          }
+     }          
+          
      stage ('Login and Push Image on docker hub') {
           agent any
         environment {
