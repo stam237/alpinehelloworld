@@ -57,9 +57,7 @@ pipeline {
           steps {
              script {
                sh '''
-                 docker save  ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG > /tmp/alpinehelloworld.tar
-                 archiveArtifacts artifacts: '//tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
-                 
+                 docker save  ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG > /tmp/alpinehelloworld.tar                 
                '''
              }
           }
@@ -126,6 +124,8 @@ pipeline {
   post {
        success {
          slackSend (color: '#00FF00', message: "ULRICH - SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+         archiveArtifacts artifacts: '//tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
+
          }
       failure {
             slackSend (color: '#FF0000', message: "ULRICH - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
