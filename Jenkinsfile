@@ -124,8 +124,7 @@ pipeline {
   post {
        success {
          slackSend (color: '#00FF00', message: "ULRICH - SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-         archiveArtifacts artifacts: '//tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
-
+         archiveArtifacts artifacts: '/tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
          }
       failure {
             slackSend (color: '#FF0000', message: "ULRICH - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
