@@ -3,9 +3,15 @@ pipeline {
        ID_DOCKER = "${ID_DOCKER_PARAMS}"
        IMAGE_NAME = "alpinehelloworld"
        IMAGE_TAG = "latest"
-//       PORT_EXPOSED = "80" à paraméter dans le job
-       STAGING = "${ID_DOCKER}-staging"
-       PRODUCTION = "${ID_DOCKER}-production"
+       // PORT_EXPOSED = "80" à paraméter dans le job obligatoirement
+       STG_API_ENDPOINT = ip10-0-1-4-cc78bhksrdn0fvnms4pg-1993.direct.docker.labs.eazytraining.fr
+       STG_APP_ENDPOINT = ip10-0-1-4-cc78bhksrdn0fvnms4pg-80.direct.docker.labs.eazytraining.fr
+       PROD_API_ENDPOINT = ip10-0-1-5-cc78bhksrdn0fvnms4pg-1993.direct.docker.labs.eazytraining.fr
+       PROD_APP_ENDPOINT = ip10-0-1-5-cc78bhksrdn0fvnms4pg-80.direct.docker.labs.eazytraining.fr
+       INTERNAL_PORT = 5000
+       EXTERNAL_PORT = ${PORT_EXPOSED}
+       CONTAINER_IMAGE = ${ID_DOCKER}/${IMAGE_NAME}:${IMAGE_TAG}
+
      }
      agent none
      stages {
@@ -24,7 +30,7 @@ pipeline {
                  sh '''
                     echo "Clean Environment"
                     docker rm -f $IMAGE_NAME || echo "container does not exist"
-                    docker run --name $IMAGE_NAME -d -p ${PORT_EXPOSED}:5000 -e PORT=5000 ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
+                    docker run --name $IMAGE_NAME -d -p ${PORT_EXPOSED}:${INTERNAL_PORT} -e PORT=${INTERNAL_PORT} ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG
                     sleep 5
                  '''
                }
@@ -80,19 +86,14 @@ pipeline {
      
      stage('Push image in staging and deploy it') {
        when {
-              expression { GIT_BRANCH == 'origin/master' }
+              expression { GIT_BRANCH == 'origin/eazylabs' }
             }
       agent any
-      environment {
-          HEROKU_API_KEY = credentials('heroku_api_key')
-      }  
+
       steps {
           script {
             sh '''
-              heroku container:login
-              heroku create $STAGING || echo "project already exist"
-              heroku container:push -a $STAGING web
-              heroku container:release -a $STAGING web
+              curl -X POST http://${STG_API_ENDPOINT}/staging -H "Content-Type: application/json" -d "{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}"
             '''
           }
         }
@@ -102,19 +103,14 @@ pipeline {
 
      stage('Push image in production and deploy it') {
        when {
-              expression { GIT_BRANCH == 'origin/production' }
+              expression { GIT_BRANCH == 'origin/master' }
             }
       agent any
-      environment {
-          HEROKU_API_KEY = credentials('heroku_api_key')
-      }  
+
       steps {
           script {
             sh '''
-              heroku container:login
-              heroku create $PRODUCTION || echo "project already exist"
-              heroku container:push -a $PRODUCTION web
-              heroku container:release -a $PRODUCTION web
+               curl -X POST http://${PROD_API_ENDPOINT}/prod -H "Content-Type: application/json" -d "{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}"
             '''
           }
         }
@@ -124,7 +120,6 @@ pipeline {
   post {
        success {
          slackSend (color: '#00FF00', message: "ULRICH - SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
-         archiveArtifacts artifacts: '/tmp/alpinehelloworld.tar', followSymlinks: false, onlyIfSuccessful: true
          }
       failure {
             slackSend (color: '#FF0000', message: "ULRICH - FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
