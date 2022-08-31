@@ -86,11 +86,7 @@ pipeline {
       }    
      
      stage('STAGING - Deploy app') {
-       when {
-              expression { GIT_BRANCH == 'origin/eazylabs' }
-            }
       agent any
-
       steps {
           script {
             sh """
