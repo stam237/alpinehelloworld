@@ -85,7 +85,7 @@ pipeline {
           }
       }    
      
-     stage('Push image in staging and deploy it') {
+     stage('STAGING - Deploy app') {
        when {
               expression { GIT_BRANCH == 'origin/eazylabs' }
             }
@@ -104,17 +104,19 @@ pipeline {
 
 
 
-     stage('Push image in production and deploy it') {
+     stage('PRODUCTION - Deploy app') {
        when {
-              expression { GIT_BRANCH == 'origin/master' }
+              expression { GIT_BRANCH == 'origin/eazylabs' }
             }
       agent any
 
       steps {
           script {
-            sh '''
+            sh """
+               # echo  {\\"your_name\\":\\"${APP_NAME}\\",\\"container_image\\":\\"${CONTAINER_IMAGE}\\", \\"external_port\\":\\"${EXTERNAL_PORT}\\", \\"internal_port\\":\\"${INTERNAL_PORT}\\"}  > data.json 
+               # curl -X POST http://${PROD_API_ENDPOINT}/prod -H 'Content-Type: application/json'  --data-binary @data.json
                curl -X POST http://${PROD_API_ENDPOINT}/prod -H 'Content-Type: application/json' -d '{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}'
-            '''
+            """
           }
         }
      }
