@@ -92,7 +92,7 @@ pipeline {
       agent any
 
       steps {
-          httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: '{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}', responseHandle: 'NONE', url: 'http://$STG_API_ENDPOINT', wrapAsMultipart: false
+          httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: '{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}', responseHandle: 'NONE', url: 'http://${env.STG_API_ENDPOINT}', wrapAsMultipart: false
           script {
             sh '''
               echo using httprequest instead of curl
