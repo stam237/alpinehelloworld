@@ -20,10 +20,10 @@ pipeline {
              agent any
              steps {
                 script {
-                  sh '''
+                  sh """
                     echo  {"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}
                     docker build -t ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG .
-                  '''
+                  """
                 }
              }
         }
