@@ -20,10 +20,7 @@ pipeline {
              agent any
              steps {
                 script {
-                  sh """
-                   echo  {\\"your_name\\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}
-                    docker build -t ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG .
-                  """
+                  sh 'docker build -t ${ID_DOCKER}/$IMAGE_NAME:$IMAGE_TAG .'
                 }
              }
         }
@@ -97,10 +94,10 @@ pipeline {
       steps {
           //httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: '{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}', responseHandle: 'NONE', url: 'http://ip10-0-1-3-cc79bn4srdn0fvnms4rg-1993.direct.docker.labs.eazytraining.fr/staging', wrapAsMultipart: false
           script {
-            sh '''
-              echo  "{\"your_name\":\"${APP_NAME}\",\"container_image\":\"${CONTAINER_IMAGE}\", \"external_port\":\"${EXTERNAL_PORT}\", \"internal_port\":\"${INTERNAL_PORT}\"}"  > data.json 
+            sh """
+              echo  {\\"your_name\\":\\"${APP_NAME}\\",\\"container_image\\":\\"${CONTAINER_IMAGE}\\", \\"external_port\\":\\"${EXTERNAL_PORT}\\", \\"internal_port\\":\\"${INTERNAL_PORT}\\"}  > data.json 
               curl -X POST http://${STG_API_ENDPOINT}/staging -H 'Content-Type: application/json'  --data-binary @data.json 
-            '''
+            """
           }
         }
      }
