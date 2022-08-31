@@ -92,9 +92,10 @@ pipeline {
       agent any
 
       steps {
+          httpRequest contentType: 'APPLICATION_JSON', httpMode: 'POST', requestBody: '{"your_name":"${APP_NAME}","container_image":"${CONTAINER_IMAGE}", "external_port":"${EXTERNAL_PORT}", "internal_port":"${INTERNAL_PORT}"}', responseHandle: 'NONE', url: 'http://$STG_API_ENDPOINT', wrapAsMultipart: false
           script {
             sh '''
-              curl -X POST http://ip10-0-1-3-cc79bn4srdn0fvnms4rg-1993.direct.docker.labs.eazytraining.fr/staging -H 'Content-Type: application/json' -d '{"your_name": `${env.APP_NAME}`,"container_image":"choco1992/alpinehelloworld:latest", "external_port":"80", "internal_port":"5000"}'
+              echo using httprequest instead of curl
             '''
           }
         }
