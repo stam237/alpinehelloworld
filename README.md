@@ -9,4 +9,3 @@ An Alpine-based Docker example
 -----test 6 -----
 ------test 7 ----
 ------test 8 ----
-jhk
