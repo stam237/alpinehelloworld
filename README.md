@@ -7,5 +7,4 @@ An Alpine-based Docker example
 -----Test3 -------
 -----test 4 o------
 -----test 6 -----
-------test 7 ----
-------test 8 ----
+------test 7 ---
